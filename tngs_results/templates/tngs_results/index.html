@@ -1,0 +1,10 @@
+{% if patient_sample_list %}
+    <ul>
+    {% for patient in patient_sample_list %}
+        <li>{{ patient.ex_number }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No patient batch are available. </p>
+{% endif %}
+
