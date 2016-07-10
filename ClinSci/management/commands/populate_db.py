@@ -30,12 +30,31 @@ class Command(BaseCommand):
         assert(header_list[0] == required_header[0]), "panel_list input error: put sequencing_panel_version in column 0"
         #check the list against each other: for item in list a check is at the same location. In list b.
 
-#    def test_batch_outputs(self)
+#    def test_batch_instance(self):
         #check the number of lines in the yaml file is as expected
         #check each is in the correct order/or is there. load the yaml file to dictionary and check all headers are present
-        #check the format of each header's values is as expected
+        #check the format of each header's values is as expected using regular expression or hardcoded where it does not change
 
-#    def test_tngs_results_format(self, header_list)
+#    def test_sample_instance(self):
+
+#    def test_Ngs_test_instance(self):
+
+#    def test_Sample_metrics_instance(self):
+
+#    def test_variant_data_instance(self):
+
+#    def test_cnv_data_instance(self):
+
+    #manager function to read in the output results to the database.
+    #try as one function to see if it updates correctly so data is linked
+    #then split into individual functions and call using arguments and handler function
+    def update_tngs_results(self, filepath):
+        #Batch instance as dict
+        #Sample instance as dict
+        #Ngs_test as dict
+        #Sample_metrics as dict
+        #Variant_data as dict
+        #Cnv_data as dict
 
     #function to read each line of the sample list file and update the database with one entry per line/sample
     def create_sample_list(self, filepath):
