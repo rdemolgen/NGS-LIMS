@@ -1,8 +1,5 @@
 from django.db import models
 
-# Create your models here.
-#
-
 #models each ngs batch
 class Batch(models.Model):
     #this all comes from the config.yaml file for each batch so assertions already in pipeline
@@ -22,6 +19,8 @@ class Batch(models.Model):
     common_artefacts_path = models.CharField(max_length=200, blank=True)
     dbsnp_path = models.CharField(max_length=200, blank=True)
     alamut_path = models.CharField(max_length=200, blank=True)
+    #take path from .yaml file and store conents as JSON object in db
+    sample_list = models.JSONField()
 
     def __str__(self):
         return self.batch_id
@@ -39,6 +38,7 @@ class Sample(models.Model):
       #b it is actually a correct filepath
       #c it is in the format we would expect - if it isn't get it any way but pring to screen that the bam format is
       #not as expected
+      #write this in the test in the manage_db.py script
     bam_file_path = models.CharField(max_length=200, blank=True)
 
     #historic_sample_id
@@ -62,7 +62,7 @@ class Ngs_test(models.Model):
     capture_version = models.CharField(max_length=200, blank=True)
     virtual_panel_phenotype = models.CharField(max_length=200, blank=True)
     #format for gene panel = { 'panel_list' : '[gene_and_exon, gene_and_exon, ... ]'} 
-    virtual_panel_genes = models.JSONField()
+    virtual_panel_genes_and_transcript = models.JSONField()
     date_of_analysis = models.CharField(max_length=200, blank=True)
     covered_interval_list_by_phenotype = models.JSONField()
     variant_calling_intervals = models.JSONField()
@@ -73,15 +73,9 @@ class Ngs_test(models.Model):
     #interval_dict = {{ 'gene_and_exon' : '<gene_and_exon>', 'bed_intervals' = ['<chrom>', 'start', 'end', 'strand']},{same_again}}
     #to minimise redeundancy, and only includethe targets relevant to the test we should only use the intervals of the test phenotype.
     #this will need to be put into the manager script an I think is e.g. v602_phenotype.code_metrics.interval_list
-
+    #/mnt/Data1/targeted_sequencing/intervals/v5
     def __str__(self):
         return self.capture_version
-
-#class test_interval_list(models.Model):
-#    interval_list_primary_key = models.AutoField(primary_key=True)
-#    Ngs_test = models.ForeignKey(Ngs_test, on_delete=models.CASCADE)
-#    interval_list = models.JSONField()
-#    variant_calling_intervals = models.JSONField()
 
 #where overall is targeted capture and phen is virtual panel metrics
 class Sample_metrics(models.Model):

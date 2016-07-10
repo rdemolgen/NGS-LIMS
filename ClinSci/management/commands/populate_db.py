@@ -16,7 +16,10 @@ class Command(BaseCommand):
 	#enables an input file to be specified and not hardcoded
         parser.add_argument('input_file', nargs='+', type=str)
 	#specifies the type of input file as a sample_list
-        parser.add_argument('--sample_list',action='store_true',dest='samples',default=False,help='initialize Sample_list class each row',)
+        parser.add_argument('--sample_list',action='store_true',dest='samples',default=False,help='initialize Sample_list class for each row',)
+        #add an  argument to specify tngs output integration to database - update all models
+        parser.add_argument('--tngs_all', action='store_true', dest='tngs_all', default=False, help='parse and store each batch, sample, sample metrics test details, snp/indels, cnv_data'
+
 
     #test function to check the format of each smaple_list - hard coded so that it will alert if it is changed upstream in the pipeine
     #ensures the data is in the input file column that matches the database model column
@@ -26,6 +29,11 @@ class Command(BaseCommand):
         required_header = ['sequencing_panel_version', 'capture_number', 'mody_number', 'ex_number', 'gender', 'profile', 'sample_type', 'comments']
         assert(header_list[0] == required_header[0]), "panel_list input error: put sequencing_panel_version in column 0"
         #check the list against each other: for item in list a check is at the same location. In list b.
+
+#    def test_batch_outputs(self)
+        #check the number of lines in the yaml file is as expected
+        #check each is in the correct order/or is there. load the yaml file to dictionary and check all headers are present
+        #check the format of each header's values is as expected
 
 #    def test_tngs_results_format(self, header_list)
 
