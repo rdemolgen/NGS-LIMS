@@ -19,6 +19,7 @@ class Batch(models.Model):
     common_artefacts_path = models.CharField(max_length=200, blank=True)
     dbsnp_path = models.CharField(max_length=200, blank=True)
     alamut_path = models.CharField(max_length=200, blank=True)
+    sample_list_path = models.CharField(max_length=200, blank=True)
     #take path from .yaml file and store conents as JSON object in db
     sample_list = models.JSONField()
 
