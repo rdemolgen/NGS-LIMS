@@ -17,8 +17,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
 	#enables an input file to be specified and not hardcoded
         parser.add_argument('--input_file', default=False, nargs = '+', type=str)
-	#specifies the type of input file as a sample_list
-        parser.add_argument('--sample_list',action='store_true',dest='samples',default=False,help='initialize Sample_list class for each row',)
         #add an  argument to specify tngs output integration to database - update all models
         parser.add_argument('--batch', action='store_true', dest='batch', default=False, help='parse and store each batch, sample, sample metrics test details, snp/indels, cnv_data')
 
@@ -58,46 +56,6 @@ class Command(BaseCommand):
         #Variant_data as dict
         #Cnv_data as dict
 
-    #function to read each line of the sample list file and update the database with one entry per line/sample
-    def create_sample_list(self, filepath):
-        #opens file for reading only
-        with open(filepath, 'r') as input:
-            #reads the first line, removes new line characters, splits by comma
-            header_list = input.readline().strip('\n').split(',')
-            #calls the test function to test the format of the input
-            self.test_sample_list_format(header_list)
-            #iterates through every other line in the input
-            for line in input:
-                #creates an empty dictionary to be updated
-                dict = {}
-                #strips newline characters
-                strip_line = line.strip('\n')
-                #splits by comma - could turn this into a function to reduce redundant code
-                line = strip_line.split(',')
-                #use the zip method to creat an array of tuples where the nth header list iterable
-                #is paired with the nth line iterable
-                for (key, value) in zip(header_list, line):
-                    #update the dictionary to contain the header as the key and the column contents on that line
-                    #as the value
-                    dict[key] = value
-                #crete a Sample_list instance (as specified by the imported class from model.py) based on the
-                #parsed input data
-                list_entry = Sample_list(
-                    sequencing_panel_version = dict['sequencing_panel_version'],
-                    capture_number = dict['capture_number'],
-                    mody_number = dict['mody_number'],
-                    ex_number = dict['ex_number'],
-                    gender = dict['gender'],
-                    profile = dict['profile'],
-                    sample_type = dict['sample_type'],
-                    comments = dict['comments']
-                )
-                #prints to screen the ex number and panel version of the created Sample_list object
-                #(one for each line in the file) - this is possible because of the def __str__ function
-                print(list_entry.ex_number + ' ' + list_entry.sequencing_panel_version)
-                #djando syntax for saving the object instance into the database
-                list_entry.save()
-
     #manager function to read in the output results to the database.
     def full_tngs_results(self, filepath):
         with open(filepath, 'r') as input:
@@ -110,11 +68,6 @@ class Command(BaseCommand):
             for i in range(1):
                 first_line = input_file.readline()
             loaded_file = yaml.load(input_file)
-#            batch_details = Batch(
-#                platform = loaded_file['sequencer_name'],
-#                batch_id = loaded_file['batch_id'],
-#                sample_list_path = loaded_file['sample_list_path']
-#            )
         #store the sample list as a JSON object {batch_id_from_yaml : [{'header_0' : 'value_0', 'header_1' :value_1 etc.},{'header_0' : 'value_0', 'header_1' :value_1 etc.}]} 
         sample_list_location = loaded_file['sample_list_path']
         with open('/home/sjccannon/Documents/lims_project/test_project/data/tngs_output_files/2016-05-22_1234678/scripts/configuration/sample_list_all.csv') as sample_list:
