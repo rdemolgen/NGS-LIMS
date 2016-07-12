@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 #models each ngs batch
@@ -21,7 +22,7 @@ class Batch(models.Model):
     alamut_path = models.CharField(max_length=200, blank=True)
     sample_list_path = models.CharField(max_length=200, blank=True)
     #take path from .yaml file and store conents as JSON object in db
-    sample_list = models.JSONField()
+    sample_list = JSONField()
 
     def __str__(self):
         return self.batch_id
@@ -52,7 +53,7 @@ class Sample(models.Model):
     #one to one with ngs_test
 
     def __str__(self):
-        return self.
+        return self.bam_file_path
 
 
 #models the ngs test used - method and version, if tngs the virtual panel phenotype, intervals covered
@@ -63,10 +64,10 @@ class Ngs_test(models.Model):
     capture_version = models.CharField(max_length=200, blank=True)
     virtual_panel_phenotype = models.CharField(max_length=200, blank=True)
     #format for gene panel = { 'panel_list' : '[gene_and_exon, gene_and_exon, ... ]'} 
-    virtual_panel_genes_and_transcript = models.JSONField()
+    virtual_panel_genes_and_transcript = JSONField()
     date_of_analysis = models.CharField(max_length=200, blank=True)
-    covered_interval_list_by_phenotype = models.JSONField()
-    variant_calling_intervals = models.JSONField()
+    covered_interval_list_by_phenotype = JSONField()
+    variant_calling_intervals = JSONField()
     sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
     #to do this we need to read in the interval file as a JSON object (a dictionary essentially)
     #interval file comes in format: chrom,start,end,strand, gene_and_exon
@@ -92,11 +93,11 @@ class Sample_metrics(models.Model):
 
 #alamut annotated
 #e.g. v501_nnnn_gender_phen.alamut.alltrans.txt
-class Variant_data():
+#class Variant_data():
 
-    def __str__(self):
-        return self.
+#    def __str__(self):
+#        return self.
 
 
-class Cnv_data():
+#class Cnv_data():
 #exomedepth_needs consideration stil

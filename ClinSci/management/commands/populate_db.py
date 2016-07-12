@@ -5,6 +5,8 @@ from django.core.management.base import BaseCommand
 
 #import the models that are to be updated
 from tngs_results.models import Sample_list
+from ClinSci.models import Batch
+import yaml
 
 #this is the nomenclature recognised by manage.py
 class Command(BaseCommand):
@@ -14,11 +16,11 @@ class Command(BaseCommand):
     #function to add arguments to the command script to call with diffeent options
     def add_arguments(self, parser):
 	#enables an input file to be specified and not hardcoded
-        parser.add_argument('input_file', nargs='+', type=str)
+        parser.add_argument('--input_file', default=False, nargs = '+', type=str)
 	#specifies the type of input file as a sample_list
         parser.add_argument('--sample_list',action='store_true',dest='samples',default=False,help='initialize Sample_list class for each row',)
         #add an  argument to specify tngs output integration to database - update all models
-        parser.add_argument('--tngs_all', action='store_true', dest='tngs_all', default=False, help='parse and store each batch, sample, sample metrics test details, snp/indels, cnv_data'
+        parser.add_argument('--batch', action='store_true', dest='batch', default=False, help='parse and store each batch, sample, sample metrics test details, snp/indels, cnv_data')
 
 
     #test function to check the format of each smaple_list - hard coded so that it will alert if it is changed upstream in the pipeine
@@ -48,7 +50,7 @@ class Command(BaseCommand):
     #manager function to read in the output results to the database.
     #try as one function to see if it updates correctly so data is linked
     #then split into individual functions and call using arguments and handler function
-    def update_tngs_results(self, filepath):
+#    def update_tngs_results(self, filepath):
         #Batch instance as dict
         #Sample instance as dict
         #Ngs_test as dict
@@ -93,6 +95,19 @@ class Command(BaseCommand):
             header_list = input.readline().strip('\n').split(',')
             #self.test_tngs_results_format(header_list) needs making
 
+    def update_batch(self):
+        with open('/home/sjccannon/Documents/lims_project/test_project/data/tngs_output_files/2016-05-22_1234678/scripts/configuration/config.yaml', 'r') as input_file:
+            for i in range(1):
+                _ = input_file.readline()
+            loaded_file = yaml.load(input_file)
+#           print (loaded_file)
+            batch_details = Batch(
+                platform = loaded_file['sequencer_name'],
+                batch_id = loaded_file['batch_id'],
+                sample_list_path = loaded_file['sample_list_path']
+            )
+        print(batch_details.sample_list_path)
+
     #handler function - handles the flags and executes the required functions
     def handle(self, *args, **options):
         if options['input_file'] and options['samples']:
@@ -101,3 +116,5 @@ class Command(BaseCommand):
         elif options['input_file'] and options['filtered']:
             for file in options['input_file']:
                 self.import_tngs_results(file)
+        elif options['batch']:
+            self.update_batch()
