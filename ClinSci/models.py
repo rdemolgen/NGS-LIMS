@@ -1,6 +1,12 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
+#sample - batch = many_many
+#sample - test = many_many
+#test - cov_metrics = one_many
+#test - snps_results = one_many
+#test - cnv_results = one_many
+
 #models each ngs batch
 class Batch(models.Model):
     #this all comes from the config.yaml file for each batch so assertions already in pipeline
@@ -27,43 +33,32 @@ class Batch(models.Model):
     def __str__(self):
         return self.batch_id
 
-#one_to_many with Sample on proviso that sample has a surrogate key
+#one_to_many with Sample, proviso that sample has a surrogate key
+#May need to make many-many to so one sample can have many batches + test
 
 #models each sample on each batch
 class Sample(models.Model):
-    #autoincrementing primary key
-    sample_primary_key = models.AutoField(primary_key=True)
-    #one_to_many with Batch i.e. each sample can only have one batch
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
-    #this can be parsed from the assembly directory of each batch, will need to include some assertions to make sure
-      #a we only get one bam file
-      #b it is actually a correct filepath
-      #c it is in the format we would expect - if it isn't get it any way but pring to screen that the bam format is
-      #not as expected
-      #write this in the test in the manage_db.py script
-    bam_file_path = models.CharField(max_length=200, blank=True)
-
-    #historic_sample_id
-    #ex number
-    #gender
-    #date
-    #dob
-
-    #one to one with metrics
-    #one to one with ngs_test
+    #many_to_many with Batch i.e. each sample can be put on multiple batches - sample synonymous with person
+    batch = models.ManyToManyField(Batch, default = '')
+    #bam_file_path = models.CharField(max_length=200, blank=True)
+    capture_number = models.CharField(max_length=10, blank=True)
+    mody_number = models.CharField(max_length=200, blank=True)
+    ex_number = models.CharField(max_length=200, blank=True)
+    gender = models.CharField(max_length=200, blank=True)
+    comments = models.CharField(max_length=200, blank=True)
+    #one to many with Ngs_test
 
     def __str__(self):
-        return self.bam_file_path
-
+        return self.capture_number
 
 #models the ngs test used - method and version, if tngs the virtual panel phenotype, intervals covered
 #and intervals for variant calling
 class Ngs_test(models.Model):
-    Ngs_test_primary_key = models.AutoField(primary_key=True) 
+    Ngs_test_primary_key = models.AutoField(primary_key=True)
     capture_method = models.CharField(max_length=200, blank=True)
     capture_version = models.CharField(max_length=200, blank=True)
-    virtual_panel_phenotype = models.CharField(max_length=200, blank=True)
-    #format for gene panel = { 'panel_list' : '[gene_and_exon, gene_and_exon, ... ]'} 
+    capture_profile = models.CharField(max_length=200, blank=True)
+    #format for gene panel = { 'panel_list' : '[gene_and_exon, gene_and_exon, ... ]'}
     virtual_panel_genes_and_transcript = JSONField()
     date_of_analysis = models.CharField(max_length=200, blank=True)
     covered_interval_list_by_phenotype = JSONField()
@@ -80,13 +75,14 @@ class Ngs_test(models.Model):
         return self.capture_version
 
 #where overall is targeted capture and phen is virtual panel metrics
-class Sample_metrics(models.Model):
+class Ngs_test_metrics(models.Model):
     overall_metrics_path = models.CharField(max_length=200, blank=True)
     phenotype_metrics_path = models.CharField(max_length=200, blank=True)
     overall_pct_target_bases_20x = models.CharField(max_length=200, blank=True)
     overall_pct_target_bases_30x = models.CharField(max_length=200, blank=True)
     phen_pct_target_bases_20x = models.CharField(max_length=200, blank=True)
     phen_pct_target_bases_30x = models.CharField(max_length=200, blank=True)
+    #one-one with ngs_test
 
     def __str__(self):
         return self.phen_pct_target_bases_20x
