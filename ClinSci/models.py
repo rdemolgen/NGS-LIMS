@@ -39,8 +39,9 @@ class Batch(models.Model):
 #models each sample on each batch
 class Sample(models.Model):
     #many_to_many with Batch i.e. each sample can be put on multiple batches - sample synonymous with person
-    batch = models.ManyToManyField(Batch, default = '')
-    #bam_file_path = models.CharField(max_length=200, blank=True)
+    sample_primary_key = models.AutoField(primary_key=True)
+    batch = models.ManyToManyField(Batch)
+    bam_file_path = models.CharField(max_length=200, blank=True)
     capture_number = models.CharField(max_length=10, blank=True)
     mody_number = models.CharField(max_length=200, blank=True)
     ex_number = models.CharField(max_length=200, blank=True)

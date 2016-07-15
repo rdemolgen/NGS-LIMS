@@ -5,12 +5,11 @@ from django.core.management.base import BaseCommand
 
 #import the models that are to be updated
 from tngs_results.models import Sample_list
-from ClinSci.models import Batch
+from ClinSci.models import Batch, Sample
 import yaml
 
 #model workspace to enable removal of hard coded paths
 #class workspace():
-
 
 #this is the nomenclature recognised by manage.py
 class Command(BaseCommand):
@@ -35,24 +34,6 @@ class Command(BaseCommand):
         assert(header_list[0] == required_header[0]), "panel_list input error: put sequencing_panel_version in column 0"
         #check the list against each other: for item in list a check is at the same location. In list b.
 
-#    def test_batch_instance(self):
-        #check the number of lines in the yaml file is as expected
-        #check each is in the correct order/or is there. load the yaml file to dictionary and check all headers are present
-        #check the format of each header's values is as expected using regular expression or hardcoded where it does not change
-
-#    def test_sample_instance(self):
-
-#    def test_Ngs_test_instance(self):
-
-#    def test_Sample_metrics_instance(self):
-
-#    def test_variant_data_instance(self):
-
-#    def test_cnv_data_instance(self):
-
-    #manager function to read in the output results to the database.
-    #try as one function to see if it updates correctly so data is linked
-    #then split into individual functions and call using arguments and handler function
 #    def update_tngs_results(self, filepath):
         #Batch instance as dict
         #Sample instances as dicts with pk from batch as foreign key
@@ -60,12 +41,6 @@ class Command(BaseCommand):
         #Sample_metrics as dict
         #Variant_data as dict
         #Cnv_data as dict
-
-    #manager function to read in the output results to the database.
-    def full_tngs_results(self, filepath):
-        with open(filepath, 'r') as input:
-            header_list = input.readline().strip('\n').split(',')
-            #self.test_tngs_results_format(header_list) needs making
 
     def update_batch(self):
         #update fields from the config file
@@ -93,7 +68,7 @@ class Command(BaseCommand):
             sample_list_path = loaded_file['sample_list_path'],
             sample_list = self.sample_sheet_json
             )
-        #batch_details.save()
+        batch_details.save()
         batch_pk = batch_details.pk
         #try return batch_instance, pass to sample_model_update and when creating declare batch=batch_details
         return batch_details
@@ -108,15 +83,14 @@ class Command(BaseCommand):
             print(v)
             for item in v:
                 sample_instance = Sample(
-                    capture_number = item['capture_number']
-                    gender = item['gender']
-                    comments = item['comments']
-                    mody_number = item['mody_number']
-                    ex_number = item['ex_number']
+                    capture_number = item['capture_number'],
+                    gender = item['gender'],
+                    comments = item['comments'],
+                    mody_number = item['mody_number'],
+                    ex_number = item['ex_number'],
                     )
-                 sample_instance.save()
-                 sample_instance.add(batch_details)
-
+                sample_instance.save()
+                sample_instance.batch.add(batch_details)
 
     #handler function - handles the flags and executes the required functions
     def handle(self, *args, **options):
